@@ -1,4 +1,7 @@
 export default class NotificationMessage {
+  // Когда использовать static свойства/методы:
+  // 1) в статических св-вах хранятся межинстансные связи/значенмя
+  // 2) планируется использовать без инстанцирования (new ClassInstance) и без this
   static activeNotification = null;
 
   element = null;

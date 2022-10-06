@@ -4,5 +4,6 @@
  * @returns {*[]} - the new array with uniq values
  */
 export function uniq(arr) {
-  return Array.from(new Set(arr));
+  // можно через Array.from(), если нужно еще и колбек/мап функцию передать
+  return [...new Set(arr)];
 }

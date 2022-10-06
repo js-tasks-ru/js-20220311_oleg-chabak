@@ -1,4 +1,6 @@
 export default class ColumnChart {
+  // эти свойства тут, т.к. не зависят от входных параметров
+  // к ним в дальнейшем можно так же обращаться через this.subElements,this.chartHeight
   subElements = {};
   chartHeight = 50;
 
@@ -7,7 +9,7 @@ export default class ColumnChart {
     label = "",
     link = "",
     value = 0,
-    formatHeading = data => data,
+    formatHeading = (data) => data, // дабы не плодить if'ы внутри рендера
   } = {}) {
     this.data = data;
     this.label = label;
@@ -18,6 +20,9 @@ export default class ColumnChart {
     this.render();
   }
 
+  // accessor properties
+  // функции, которые используются для присвоения и получения значения,
+  // но во внешнем коде они выглядят как обычные свойства объекта
   get template() {
     return `
       <div class="column-chart column-chart_loading" style="--chart-height: ${ this.chartHeight }">
@@ -36,6 +41,7 @@ export default class ColumnChart {
       </div>
     `;
   }
+  // set template не задан
 
   render() {
     const element = document.createElement("div");
@@ -61,7 +67,11 @@ export default class ColumnChart {
       result[name] = subElement;
     }
 
-    console.log({result});
+    // console.log({result});
+    // {
+    //   header: { link to <div data-element="header"... }
+    //   body: { link to <div data-element="body"... }
+    // }
     return result;
   }
 
@@ -88,7 +98,10 @@ export default class ColumnChart {
 
   update(data) {
     this.data = data;
-
+    // Дабы не обращаться к медленному DOM, типа
+    // document.querySelector('div[data-element="header"]')
+    // сразу сохраним изменяемые части в переменной,
+    // чтобы потом менять их тут и вставлять в DOM уже строкой
     this.subElements.body.innerHTML = this.getColumnBody(data);
   }
 

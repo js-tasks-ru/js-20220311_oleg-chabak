@@ -1,7 +1,8 @@
-import NotificationMessage from "../1-notification";
-
+// наследование в классах это DRY, abstraction
 export default class SortableTable {
+  // инкапсулированные св-ва инстанса (не зависят от входных параметров)
   element = null;
+  // тут хранятся ссылки на DOM (аналог Virtual DOM)
   subElements = {};
 
   constructor(headerConfig = [], data = []) {
@@ -43,12 +44,13 @@ export default class SortableTable {
   }
 
   getTableRow(item) {
-    const cells = this.headerConfig.map(({id, template}) => {
+    const cellsData = this.headerConfig.map(({id, template}) => {
       return {id, template};
     });
-    return cells.map(({id, template}) => {
+    const templateCells = cellsData.map(({id, template}) => {
       return template ? template(item[id]) : `<div class="sortable-table__cell">${item[id]}</div>`
-    }).join('');
+    });
+    return templateCells.join('');
   }
 
   getTable() {
@@ -74,6 +76,12 @@ export default class SortableTable {
       const name = subElement.dataset.element;
       result[name] = subElement;
     }
+    // console.log(result);
+    // {
+    //   arrow: <span.sortable-table__sort-arrow ...>,
+    //   body: <div.sortable-table__body ...>,
+    //   header: <div.sortable-table__header.sortable-table__row ...>,
+    // }
     return result;
   }
 
