@@ -6,10 +6,10 @@
  */
 export const omit = (obj, ...fields) => {
   const newObj = {};
-  for (const key in obj) {
+  Object.entries(obj).forEach(([key, value]) => {
     if (!fields.includes(key)) {
-      newObj[key] = obj[key];
+      newObj[key] = value;
     }
-  }
+  });
   return newObj;
 };

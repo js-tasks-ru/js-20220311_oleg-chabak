@@ -1,16 +1,24 @@
 export default class NotificationMessage {
-  static elem = null;
-  static timerId = null;
+  // Когда использовать static свойства/методы:
+  // 1) в статических св-вах хранятся межинстансные связи/значенмя
+  // 2) планируется использовать без инстанцирования (new ClassInstance) и без this
+  static activeNotification = null;
 
-  constructor(message = '', {type = 'error', duration = 0} = {}) {
+  element = null;
+  timerId = null;
+
+  constructor(message = '', {type = 'error', duration = 1000} = {}) {
     this.message = message;
     this.type = type;
     this.duration = duration;
+    this.durationInSeconds = `${ duration / 1000 }s`;
+
+    this.render();
   }
 
-  getTemplate() {
+  get template() {
     return `
-    <div class="notification ${this.type}" style="--value:${this.duration / 1000}s">
+    <div class="notification ${this.type}" style="--value:${this.durationInSeconds}">
       <div class="timer"></div>
       <div class="inner-wrapper">
         <div class="notification-header">${this.type}</div>
@@ -21,20 +29,27 @@ export default class NotificationMessage {
     </div>`;
   }
 
-  destroy() {
-    clearTimeout(NotificationMessage.timerId);
-    NotificationMessage.timerId = null;
-    NotificationMessage.elem.remove();
-    NotificationMessage.elem = null;
+  remove() {
+    clearTimeout(this.timerId);
+    if (this.element) this.element.remove();
   }
 
-  show() {
-    NotificationMessage.elem && this.destroy();
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = this.getTemplate();
-    this.element = wrapper.firstElementChild;
-    document.body.append(wrapper);
-    NotificationMessage.elem = wrapper;
-    NotificationMessage.timerId = setTimeout(()=> this.destroy(), this.duration);
+  destroy() {
+    this.remove();
+    this.element = null;
+    NotificationMessage.activeNotification = null;
+  }
+
+  render() {
+    const element = document.createElement('div');
+    element.innerHTML = this.template;
+    this.element = element.firstElementChild;
+  }
+
+  show(domElement = document.body) {
+    if (NotificationMessage.activeNotification) NotificationMessage.activeNotification.remove();
+    domElement.append(this.element);
+    this.timerId = setTimeout(()=> this.remove(), this.duration);
+    NotificationMessage.activeNotification = this;
   }
 }

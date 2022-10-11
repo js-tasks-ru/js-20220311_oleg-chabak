@@ -16,6 +16,11 @@
       type: 'success'
     });
 
+    // можно отображать сразу при создании инстанса,
+    // но так больше гибкости, позволяет добавить проверку, например
+    // if (true) { notification.show() }
+    // или можно внутрь передать DOM-элемент для отрисовки
+    // notification.show(document.body);
     notification.show();
   });
 </script>
