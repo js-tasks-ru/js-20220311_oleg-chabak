@@ -13,6 +13,14 @@ export default class SortableTable {
     return orders[order];
   };
 
+  sortHandler = (event) => {
+    let targetCell = event.target.closest('[data-sortable="true"]');
+    if (!targetCell) return;
+    const id = targetCell.dataset.id;
+    const order = this.toggleOrder(targetCell.dataset.order || this.defaultOrder);
+    this.sort(id, order);
+  }
+
   constructor(headerConfig, {
     data = [],
     sorted = {}
@@ -36,14 +44,6 @@ export default class SortableTable {
     wrapper.innerHTML = this.getTable(sortedData, this.sorted);
     this.element = wrapper.firstElementChild;
     this.subElements = this.getSubElements(this.element);
-  }
-
-  sortHandler= (event) => {
-    let headerCell = event.target.closest('[data-sortable="true"]');
-    if (!headerCell) return;
-    const id = headerCell.dataset.id;
-    const order = this.toggleOrder(headerCell.dataset.order || this.defaultOrder);
-    this.sort(id, order);
   }
 
   initEventListeners() {
@@ -113,7 +113,7 @@ export default class SortableTable {
     if (!id && !order) return this.data;
     const arr = [...this.data];
     const columnConfig = this.headerConfig.find((item) => item.id === id);
-    const { sortType } = columnConfig;
+    const { sortType, customSorting } = columnConfig;
     const directions = {
       asc: 1,
       desc: -1,
@@ -121,6 +121,10 @@ export default class SortableTable {
     const direction = directions[order];
     return arr.sort((a, b) => {
       switch (sortType) {
+      // для сортировок, отличающихся от string и number
+      // например сортировка по дате или статусу
+      case 'custom':
+        return direction * customSorting(a, b);
       case 'string':
         return direction * a[id].localeCompare(b[id], ['ru', 'en']);
       case 'number':
